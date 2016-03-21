@@ -1,0 +1,106 @@
+C51 COMPILER V9.52.0.0   POWERBLE                                                          12/11/2015 10:41:23 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE POWERBLE
+OBJECT MODULE PLACED IN powerBLE.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE powerBLE.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*---------------------------------------------------------------------*/
+   2          /* --- STC MCU Limited ------------------------------------------------*/
+   3          /* --- STC15F4K60S4 ?? ???2????1?????????------------*/
+   4          /* --- Mobile: (86)13922805190 ----------------------------------------*/
+   5          /* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+   6          /* --- Tel: 86-0513-55012928,55012929,55012966-------------------------*/
+   7          /* --- Web: www.STCMCU.com --------------------------------------------*/
+   8          /* --- Web: www.GXWMCU.com --------------------------------------------*/
+   9          
+  10          #include "defines.h"
+  11          #include "stdio.h"
+  12          #include "string.h"
+  13          #include "math.h"
+  14          
+  15          const int VER_NUM=26;
+  16          
+  17          #define TMP_FORMAT_STR  "TMP:%d,PRE:%d,V%d\r\n"
+  18          
+  19          #define UART_USE_P17 1
+  20          #define UART_USE_P30 0
+  21          
+  22          #define BLE_POWER_ON    BLE_MOD_PWR=1 
+  23          #define BLE_POWER_OFF   BLE_MOD_PWR=0
+  24          
+  25          void InitPort(){
+  26   1      
+  27   1      //By HeYC P1M0=0xb7;  //p1 mode 1011 0111
+  28   1        P1M0=0xB4;//By HeYC 1011 0100
+  29   1        P1M1=0x00;
+  30   1        P3M0=0x13;  //p3 mode 0001 0011
+  31   1        P3M1=0x00;
+  32   1        
+  33   1        P3=0x00;//
+  34   1        MSG_LED_2=0;
+  35   1        //BLE_MOD_RST=0;
+  36   1      }
+  37          
+  38          void Delay100us()   //@11.0592MHz
+  39          {
+  40   1        unsigned char i, j;
+  41   1      
+  42   1        _nop_();
+  43   1        _nop_();
+  44   1        i = 2;
+  45   1        j = 15;
+  46   1        do
+  47   1        {
+  48   2          while (--j);
+  49   2        } while (--i);
+  50   1      }
+  51          
+  52          
+  53          void DelayMS(int imsCnt)    //@11.0592MHz
+  54          {
+  55   1        int k=0,m=0;
+C51 COMPILER V9.52.0.0   POWERBLE                                                          12/11/2015 10:41:23 PAGE 2   
+
+  56   1      //  unsigned char i, j;
+  57   1      
+  58   1        for(m=0;m<imsCnt;m++){
+  59   2          for(k=0;k<10;k++){
+  60   3            Delay100us();
+  61   3          }
+  62   2        }
+  63   1      }
+  64          
+  65          void main()
+  66          {
+  67   1          //int i=0,j=0,sCnt=0,
+  68   1        int tmpRead=0,tmpSendLastTm=0,absTmpVal=0;
+  69   1        char strBuf[24]={0};
+  70   1      
+  71   1        //Init port for IO use
+  72   1        InitPort();
+  73   1        
+  74   1        BLE_MOD_PWR=1;
+  75   1        MSG_LED_1=1;
+  76   1      
+  77   1        while(1){
+  78   2          
+  79   2        }
+  80   1      }
+  81          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    111    ----
+   CONSTANT SIZE    =     24    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2      30
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

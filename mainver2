@@ -1,0 +1,106 @@
+/*---------------------------------------------------------------------*/
+/* --- STC MCU Limited ------------------------------------------------*/
+/* --- STC15F4K60S4 ?? ???2????1?????????------------*/
+/* --- Mobile: (86)13922805190 ----------------------------------------*/
+/* --- Fax: 86-0513-55012956,55012947,55012969 ------------------------*/
+/* --- Tel: 86-0513-55012928,55012929,55012966-------------------------*/
+/* --- Web: www.STCMCU.com --------------------------------------------*/
+/* --- Web: www.GXWMCU.com --------------------------------------------*/
+
+#include "defines.h"
+#include "stdio.h"
+#include "string.h"
+
+#define TMP_FORMAT_STR	"TMP:%dc,VER:%d\r\n"
+
+#define UART_USE_P17 1
+#define UART_USE_P30 0
+
+#define BLE_POWER_ON		BLE_MOD_PWR=1	
+#define BLE_POWER_OFF		BLE_MOD_PWR=0
+
+void InitPort(){
+
+//By HeYC	P1M0=0xb7;  //p1 mode	1011 0111
+	P1M0=0xB4;//By HeYC	1011 0100
+	P1M1=0x00;
+	P3M0=0x13;  //p3 mode 0001 0011
+	P3M1=0x00;
+}
+
+void Delay100us()		//@11.0592MHz
+{
+	unsigned char i, j;
+
+	_nop_();
+	_nop_();
+	i = 2;
+	j = 15;
+	do
+	{
+		while (--j);
+	} while (--i);
+}
+
+
+void Delay1ms(int imsCnt)		//@11.0592MHz
+{
+	int k=0,m=0;
+//	unsigned char i, j;
+
+	for(m=0;m<imsCnt;m++){
+		for(k=0;k<10;k++){
+			Delay100us();
+		}
+	}
+}
+
+void main()
+{
+	  int i=0,j=0,sCnt=0,tmpRead=0;
+	  char strBuf[24]={0};
+
+	//Init port for IO use
+	InitPort();
+	//Init for UART used
+	InitUart(UART_USE_P17);
+	
+	//
+	init_temp_IIC();
+
+	//Flags of IE register
+    	ES = 1;                     
+    	EA = 1;
+
+	WKTCL = 0x05;                     //设置唤醒周期为488us*(49+1) = 24.4ms
+    	WKTCH = 0xA8;                   //使能掉电唤醒定时器
+    
+    	while(1){
+
+		//Power Off for BLE
+		BLE_MOD_PWR=0;
+		MSG_LED_1=0;
+		
+		//Begin enter sleep mode.
+		PCON = 0x02;                //进入掉电模式
+
+		//Power ON for BLE
+		BLE_MOD_PWR=1;
+		MSG_LED_1=1;
+		
+		//Clear send buffer
+
+		Delay1ms(1000);
+		
+		//for(i=0;i<5;i++){
+			memset(strBuf,0,sizeof(strBuf));
+		
+			tmpRead=readtmp112();
+			tmpRead=tmpRead*0.0625;
+			sprintf(strBuf,TMP_FORMAT_STR,tmpRead,i+10);
+			SendString(strBuf);
+			Delay1ms(500);
+		//}
+	}
+}
+
